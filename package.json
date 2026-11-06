@@ -60,23 +60,16 @@
       "deleteAppDataOnUninstall": true
     },
     "linux": {
-      "target": [
-        "AppImage"
-      ],
-      "artifactName": "LesonOS-Launcher-${version}.${ext}"
+      "target": ["AppImage"],
+      "artifactName": "LesonOS-Launcher.${ext}"
     },
     "win": {
-      "target": [
-        "nsis"
-      ],
-      "artifactName": "LesonOS-Launcher-Setup-${version}.${ext}"
+      "target": ["nsis"],
+      "artifactName": "LesonOS-Launcher-Setup.${ext}"
     },
     "mac": {
-      "target": [
-        "dmg",
-        "zip"
-      ],
-      "artifactName": "LesonOS-Launcher-${version}-${arch}.${ext}"
+      "target": ["dmg", "zip"],
+      "artifactName": "LesonOS-Launcher-${arch}.${ext}"
     }
   },
   "repository": {
