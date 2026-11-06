@@ -1,16 +1,16 @@
-name: Build
+name: Build and Deploy
 
-on: workflow_dispatch
+on:
+  workflow_dispatch: # Запуск только вручную
 
 jobs:
+  # ЭТАП 1: Сборка под все системы
   release:
     runs-on: ${{ matrix.os }}
-
     permissions:
       contents: write
-
     strategy:
-      fail-fast: false # Не отменять другие ОС, если одна упадет
+      fail-fast: false # Если Mac упадет, Windows и Linux продолжат сборку
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
 
@@ -33,39 +33,39 @@ jobs:
         run: npm run dist -- --publish always
         shell: bash
 
-      # --- ДЕПЛОЙ НА СЕРВЕР ---
-      - name: Upload Linux to Server
-        if: matrix.os == 'ubuntu-latest'
-        uses: appleboy/scp-action@v0.1.7
+      # Сохраняем собранные файлы как артефакты
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
         with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "dist/LesonOS-Launcher.AppImage"
-          target: "/opt/sites/minecraft/builds/"
-          strip_components: 1
-          rm: true
+          name: builds-${{ matrix.os }}
+          path: |
+            dist/*.exe
+            dist/*.AppImage
+            dist/*.dmg
+          if-no-files-found: ignore
 
-      - name: Upload Windows to Server
-        if: matrix.os == 'windows-latest'
-        uses: appleboy/scp-action@v0.1.7
+  # ЭТАП 2: Отправка на сервер (запустится только если сборка успешна)
+  deploy:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
         with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "dist/LesonOS-Launcher-Setup.exe"
-          target: "/opt/sites/minecraft/builds/"
-          strip_components: 1
-          rm: true
+          path: all-builds
+          merge-multiple: true # Собирает все файлы из разных ОС в одну папку
 
-      - name: Upload MacOS to Server
-        if: matrix.os == 'macos-latest'
-        uses: appleboy/scp-action@v0.1.7
+      - name: Setup SSH Key
+        uses: shimataro/ssh-key-action@v2
         with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "dist/LesonOS-Launcher-*.dmg"
-          target: "/opt/sites/minecraft/builds/"
-          strip_components: 1
-          rm: true
+          known_hosts: 'just-a-placeholder-for-now'
+          name: github_actions
+
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to Server
+        run: |
+          # Копируем файлы без удаления самой папки (просто перезаписываем)
+          scp all-builds/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/sites/minecraft/builds/
