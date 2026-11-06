@@ -10,30 +10,62 @@ jobs:
       contents: write
 
     strategy:
-      fail-fast: false
+      fail-fast: false # Не отменять другие ОС, если одна упадет
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: 3.x
 
       - name: Install Dependencies
         run: npm ci
         shell: bash
 
-      - name: Build & Publish
+      - name: Build & Publish to GitHub
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run dist -- --publish always
         shell: bash
+
+      # --- ДЕПЛОЙ НА СЕРВЕР ---
+      - name: Upload Linux to Server
+        if: matrix.os == 'ubuntu-latest'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "dist/LesonOS-Launcher.AppImage"
+          target: "/opt/sites/minecraft/builds/"
+          strip_components: 1
+          rm: true
+
+      - name: Upload Windows to Server
+        if: matrix.os == 'windows-latest'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "dist/LesonOS-Launcher-Setup.exe"
+          target: "/opt/sites/minecraft/builds/"
+          strip_components: 1
+          rm: true
+
+      - name: Upload MacOS to Server
+        if: matrix.os == 'macos-latest'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "dist/LesonOS-Launcher-*.dmg"
+          target: "/opt/sites/minecraft/builds/"
+          strip_components: 1
+          rm: true
