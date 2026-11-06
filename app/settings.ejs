@@ -274,6 +274,21 @@
                 <span class="settingsTabHeaderText"><%- lang('settings.launcherTabHeaderText') %></span>
                 <span class="settingsTabHeaderDesc"><%- lang('settings.launcherTabHeaderDesc') %></span>
             </div>
+                        <div class="settingsFieldContainer">
+                <div class="settingsFieldLeft">
+                    <span class="settingsFieldTitle"><%- lang('settings.languageTitle') %></span>
+                    <span class="settingsFieldDesc"><%- lang('settings.languageDesc') %></span>
+                </div>
+                <div class="settingsFieldRight">
+                    <div class="settingsSelectContainer">
+                        <div class="settingsSelectSelected" id="settingsLanguageSelected">Русский</div>
+                        <div class="settingsSelectOptions" id="settingsLanguageOptions" hidden>
+                            <div class="settingsSelectOption" data-value="ru_RU">Русский</div>
+                            <div class="settingsSelectOption" data-value="en_US">English</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="settingsFieldContainer">
                 <div class="settingsFieldLeft">
                     <span class="settingsFieldTitle"><%- lang('settings.allowPrereleaseTitle') %></span>

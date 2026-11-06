@@ -423,3 +423,32 @@ exports.validateSelected = async function(){
     }
     
 }
+/**
+ * Добавляет оффлайн-аккаунт (для пираток и новичков)
+ */
+exports.addOfflineAccount = function(username) {
+    try {
+        const crypto = require('crypto')
+        // Генерируем фейковый UUID как в оффлайн-режиме Minecraft
+        const hash = crypto.createHash('md5').update('OfflinePlayer:' + username).digest('hex')
+        const uuid = hash.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5')
+
+        // Сохраняем аккаунт с токеном "offline"
+        const ret = ConfigManager.addMojangAuthAccount(uuid, 'offline', username, username)
+        ConfigManager.save()
+        return ret
+    } catch (err) {
+        console.error('Ошибка оффлайн-входа:', err)
+        return Promise.reject(err)
+    }
+}
+
+// Перезаписываем функцию валидации, чтобы она не стучалась в Mojang для оффлайн-аккаунтов
+const originalValidate = exports.validateSelected
+exports.validateSelected = async function() {
+    const current = ConfigManager.getSelectedAccount()
+    if (current && current.accessToken === 'offline') {
+        return true // Оффлайн аккаунт всегда валиден
+    }
+    return await originalValidate()
+}

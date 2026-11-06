@@ -38,7 +38,14 @@ loginPasswordDisclaimer2 = "{appName} is not affiliated with Mojang AB."
 loginOptionsTitle = "Login Options"
 loginWithMicrosoft = "Login with Microsoft"
 loginWithMojang = "Login with Mojang"
+loginOffline = "Login Offline (No Account)"
+offlinePrompt = "Enter username (3-16 chars, A-Z, 0-9, _)"
+offlineInvalidNick = "Invalid username! Use 3-16 chars: A-Z, 0-9, _"
 cancelButton = "Cancel"
+offlineModalTitle = "Offline Login"
+offlineModalDesc = "Enter your username<br>(3-16 chars: A-Z, 0-9, _)"
+offlineModalPlay = "Play"
+offlineModalCancel = "Cancel"
 
 [ejs.overlay]
 serverSelectHeader = "Available Servers"
@@ -49,6 +56,8 @@ accountSelectConfirm = "Select"
 accountSelectCancel = "Cancel"
 
 [ejs.settings]
+languageTitle = "Language"
+languageDesc = "Select launcher language"
 navHeaderText = "Settings"
 navAccount = "Account"
 navMinecraft = "Minecraft"
@@ -129,7 +138,6 @@ waitingText = "Waiting for Microsoft.."
 [ejs.welcome]
 continueButton = "CONTINUE"
 
-
 [js.discord]
 waiting = "Waiting for Client.."
 state = "Server: {shortId}"
@@ -180,7 +188,7 @@ javaDownloadPrepare = "Preparing Java Download.."
 javaDownloadFailureTitle = "Error During Java Download"
 javaDownloadFailureText = "See console (CTRL + Shift + i) for more details."
 javaRequired = "Java is Required<br>to Launch"
-javaRequiredMessage = 'A valid x64 installation of Java {major} is required to launch.<br><br>Please refer to our <a href="https://github.com/dscalzi/HeliosLauncher/wiki/Java-Management#manually-installing-a-valid-version-of-java">Java Management Guide</a> for instructions on how to manually install Java.'
+javaRequiredMessage = 'A valid x64 installation of Java {major} is required to launch.<br><br>Please refer to our <a href="https://github.com/dscalzi/LesonoSLauncher/wiki/Java-Management#manually-installing-a-valid-version-of-java">Java Management Guide</a> for instructions on how to manually install Java.'
 javaRequiredDismiss = "I Understand"
 javaRequiredCancel = "Go Back"
 
@@ -203,7 +211,7 @@ downloadingFiles = "Downloading files.."
 errorDuringFileDownloadTitle = "Error During File Download"
 preparingToLaunch = "Preparing to launch.."
 launchingGame = "Launching game.."
-launchWrapperNotDownloaded = "The main file, LaunchWrapper, failed to download properly. As a result, the game cannot launch.<br><br>To fix this issue, temporarily turn off your antivirus software and launch the game again.<br><br>If you have time, please <a href=\"https://github.com/dscalzi/HeliosLauncher/issues\">submit an issue</a> and let us know what antivirus software you use. We'll contact them and try to straighten things out."
+launchWrapperNotDownloaded = "The main file, LaunchWrapper, failed to download properly. As a result, the game cannot launch.<br><br>To fix this issue, temporarily turn off your antivirus software and launch the game again.<br><br>If you have time, please <a href=\"https://github.com/dscalzi/LesonoSLauncher/issues\">submit an issue</a> and let us know what antivirus software you use. We'll contact them and try to straighten things out."
 doneEnjoyServer = "Done. Enjoy the server!"
 checkConsoleForDetails = "Please check the console (CTRL + Shift + i) for more details."
 

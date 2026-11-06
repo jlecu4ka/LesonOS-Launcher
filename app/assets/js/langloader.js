@@ -6,17 +6,23 @@ const merge = require('lodash.merge')
 let lang
 
 exports.loadLanguage = function(id){
-    lang = merge(lang || {}, toml.parse(fs.readFileSync(path.join(__dirname, '..', 'lang', `${id}.toml`))) || {})
+    const filePath = path.join(__dirname, '..', 'lang', `${id}.toml`)
+    if (fs.existsSync(filePath)) {
+        lang = merge(lang || {}, toml.parse(fs.readFileSync(filePath)) || {})
+    } else {
+        console.warn(`Файл перевода не найден: ${id}.toml`)
+    }
 }
 
 exports.query = function(id, placeHolders){
     let query = id.split('.')
     let res = lang
     for(let q of query){
-        res = res[q]
+        if (res === undefined) break
+            res = res[q]
     }
-    let text = res === lang ? '' : res
-    if (placeHolders) {
+    let text = res === lang || res === undefined ? '' : res
+    if (placeHolders && typeof text === 'string') {
         Object.entries(placeHolders).forEach(([key, value]) => {
             text = text.replace(`{${key}}`, value)
         })
@@ -33,11 +39,21 @@ exports.queryEJS = function(id, placeHolders){
 }
 
 exports.setupLanguage = function(){
-    // Load Language Files
+    // Загружаем базовый английский
     exports.loadLanguage('en_US')
-    // Uncomment this when translations are ready
-    //exports.loadLanguage('xx_XX')
 
-    // Load Custom Language File for Launcher Customizer
+    // Безопасно подгружаем ConfigManager (только когда функция вызвана)
+    try {
+        const ConfigManager = require('./configmanager')
+        const selectedLocale = ConfigManager.getLocale()
+
+        if (selectedLocale && selectedLocale !== 'en_US') {
+            exports.loadLanguage(selectedLocale)
+        }
+    } catch (e) {
+        console.warn("Не удалось загрузить настройки языка:", e.message)
+    }
+
+    // Загружаем кастомный файл
     exports.loadLanguage('_custom')
 }

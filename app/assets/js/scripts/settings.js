@@ -1581,3 +1581,51 @@ async function prepareSettings(first = false) {
 
 // Prepare the settings UI on startup.
 //prepareSettings(true)
+// ==========================================
+// ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА
+// ==========================================
+(function initLanguageSwitcher() {
+    const langOptions = document.querySelectorAll('#settingsLanguageOptions .settingsSelectOption');
+    const langSelected = document.getElementById('settingsLanguageSelected');
+    const langOptionsContainer = document.getElementById('settingsLanguageOptions');
+
+    if (!langSelected || !langOptionsContainer) return;
+
+    // Безопасно получаем текущий язык
+    let currentLang = 'ru_RU';
+    try {
+        if (ConfigManager && typeof ConfigManager.getLocale === 'function') {
+            currentLang = ConfigManager.getLocale() || 'ru_RU';
+        }
+    } catch (e) {
+        console.warn("Не удалось получить язык из ConfigManager", e);
+    }
+
+    langSelected.innerText = currentLang === 'en_US' ? 'English' : 'Русский';
+
+    langOptions.forEach(opt => {
+        opt.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const newLang = opt.getAttribute('data-value'); // 'ru_RU' или 'en_US'
+
+            langSelected.innerText = opt.innerText;
+            langOptionsContainer.hidden = true;
+            langSelected.classList.remove('select-arrow-active');
+
+            // Сохраняем в конфиг
+            try {
+                if (ConfigManager && typeof ConfigManager.setLocale === 'function') {
+                    ConfigManager.setLocale(newLang);
+                    ConfigManager.save();
+                }
+            } catch (err) {
+                console.error("Ошибка при сохранении языка:", err);
+            }
+
+            alert(newLang === 'en_US' ? 'Language changed. Launcher will restart.' : 'Язык изменен. Лаунчер перезагрузится.');
+
+            // Отправляем сигнал на перезапуск
+            ipcRenderer.send('relaunch-app');
+        });
+    });
+})();

@@ -1,6 +1,6 @@
 /* Github Code Highlighting. */
 @import "../../../node_modules/github-syntax-dark/lib/github-dark.css";
-
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Space+Grotesk:wght@700&display=swap');
 /*******************************************************************************
  *                                                                             *
  * Fonts                                                                       *
@@ -542,15 +542,15 @@ body, button {
     10%, 90% {
         transform: translate3d(-1px, 0, 0);
     }
-    
+
     20%, 80% {
         transform: translate3d(2px, 0, 0);
     }
-  
+
     30%, 50%, 70% {
         transform: translate3d(-4px, 0, 0);
     }
-  
+
     40%, 60% {
         transform: translate3d(4px, 0, 0);
     }
@@ -3426,7 +3426,7 @@ input:checked + .toggleSwitchSlider:before {
     top: 25px;
     display: none;
 }
- 
+
 /* Left side of launch details container, displays percentage and a divider. */
 #launch_details_left {
     display: flex;
@@ -3965,4 +3965,94 @@ input:checked + .toggleSwitchSlider:before {
 /* Class which is applied when the spinner image is spinning. */
 .rotating {
     animation: rotating 10s linear infinite;
+}
+/* ========================================= */
+/* LESONOS CUSTOM THEME (Оранжевый / Темный) */
+/* ========================================= */
+
+
+body, .btn, input, select, textarea {
+    font-family: 'Inter', sans-serif !important;
+    letter-spacing: 0.5px;
+}
+
+/* Темный фон */
+#main, .settings-container, .modal-content, #server-selection {
+background-color: rgba(5, 5, 5, 0.9) !important;
+color: #fff !important;
+}
+
+/* Кнопки */
+.btn, .btn-primary, #settingsNavDone, #welcomeButton, #loginButton {
+    background: #FF9800 !important;
+    color: #000 !important;
+    font-weight: 800 !important;
+    text-transform: uppercase;
+    border-radius: 50px !important;
+    border: none !important;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(255, 152, 0, 0.3) !important;
+    padding: 10px 30px !important;
+}
+
+.btn:hover, .btn-primary:hover {
+    background: #FFB74D !important;
+    transform: translateY(-2px);
+}
+
+/* Кнопка "Играть" (PLAY) */
+#launch_button {
+font-family: 'Space Grotesk', sans-serif !important;
+font-size: 24px !important;
+color: #FF9800 !important;
+font-weight: 900 !important;
+background: none !important;
+box-shadow: none !important;
+}
+#launch_button:hover {
+text-shadow: 0px 0px 20px #FF9800, 0px 0px 20px #FF9800 !important;
+}
+
+/* Перекрашиваем SVG-иконки (настройки, соцсети, домик) */
+svg, .mediaSVG, #settingsSVG, #welcomeSVG, #loginSVG, #newsButtonSVG {
+    fill: #A1A1AA !important;
+    stroke: #A1A1AA !important;
+    transition: 0.3s ease;
+}
+
+/* При наведении иконки становятся оранжевыми */
+a:hover svg, button:hover svg, .mediaContainer:hover svg, .mediaURL:hover svg {
+    fill: #FF9800 !important;
+    stroke: #FF9800 !important;
+}
+
+/* Имя игрока */
+#user_text, #player_name {
+color: #FF9800 !important;
+font-weight: 900 !important;
+font-family: 'Space Grotesk', sans-serif !important;
+font-size: 14px !important;
+}
+
+/* Нижняя панель */
+#lower {
+background: linear-gradient(to top, rgba(0,0,0,0.95), transparent) !important;
+}
+
+/* Поля ввода (Логин, Пароль, Настройки) */
+input, select, .settingsFileSelVal {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid rgba(255,152,0,0.3) !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+}
+input:focus, select:focus {
+    border-color: #FF9800 !important;
+    outline: none !important;
+}
+/* Красивая ширина для выпадающего списка языков */
+#settingsLanguageSelected {
+min-width: 120px; /* Делаем кнопку шире */
+text-align: left;
+position: relative;
 }

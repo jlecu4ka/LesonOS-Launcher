@@ -11,8 +11,11 @@ const path                              = require('path')
 const semver                            = require('semver')
 const { pathToFileURL }                 = require('url')
 const { AZURE_CLIENT_ID, MSFT_OPCODE, MSFT_REPLY_TYPE, MSFT_ERROR, SHELL_OPCODE } = require('./app/assets/js/ipcconstants')
-const LangLoader                        = require('./app/assets/js/langloader')
+const LangLoader = require('./app/assets/js/langloader')
+const ConfigManager = require('./app/assets/js/configmanager') // ДОБАВЛЕНА ЭТА СТРОКА
 
+// Загружаем конфиг ДО того, как настраиваем язык
+ConfigManager.load()
 // Setup Lang
 LangLoader.setupLanguage()
 
@@ -108,6 +111,13 @@ ipcMain.handle(SHELL_OPCODE.TRASH_ITEM, async (event, ...args) => {
 // https://electronjs.org/docs/tutorial/offscreen-rendering
 app.disableHardwareAcceleration()
 
+ipcMain.on('relaunch-app', () => {
+    // Даем время файлу конфигурации сохраниться на диск
+    setTimeout(() => {
+        app.relaunch();
+        app.exit(0);
+    }, 500);
+});
 
 const REDIRECT_URI_PREFIX = 'https://login.microsoftonline.com/common/oauth2/nativeclient?'
 
@@ -245,6 +255,7 @@ function createWindow() {
     Object.entries(data).forEach(([key, val]) => ejse.data(key, val))
 
     win.loadURL(pathToFileURL(path.join(__dirname, 'app', 'app.ejs')).toString())
+    // win.webContents.openDevTools()
 
     /*win.once('ready-to-show', () => {
         win.show()
