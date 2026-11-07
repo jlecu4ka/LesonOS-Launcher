@@ -10,7 +10,7 @@ jobs:
     permissions:
       contents: write
     strategy:
-      fail-fast: false # Если Mac упадет, Windows и Linux продолжат сборку
+      fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
 
@@ -44,7 +44,7 @@ jobs:
             dist/*.dmg
           if-no-files-found: ignore
 
-  # ЭТАП 2: Отправка на сервер (запустится только если сборка успешна)
+  # ЭТАП 2: Отправка на сервер
   deploy:
     needs: release
     runs-on: ubuntu-latest
@@ -53,19 +53,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: all-builds
-          merge-multiple: true # Собирает все файлы из разных ОС в одну папку
+          merge-multiple: true 
 
-      - name: Setup SSH Key
-        uses: shimataro/ssh-key-action@v2
+      - name: Deploy to Server via SCP
+        uses: appleboy/scp-action@v0.1.7
         with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: 'just-a-placeholder-for-now'
-          name: github_actions
-
-      - name: Adding Known Hosts
-        run: ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-
-      - name: Deploy to Server
-        run: |
-          # Копируем файлы без удаления самой папки (просто перезаписываем)
-          scp all-builds/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/sites/minecraft/builds/
+          source: "all-builds/*"
+          target: "/opt/sites/minecraft/builds/"
+          strip_components: 1
