@@ -7,7 +7,7 @@ const logger = LoggerUtil.getLogger('DistroManager')
 // Указываем домены/IP
 // 77.239.226.206 - основной сайт
 // 95.85.246.91 - хостинг зеркала
-const MIRROR_URL = 'http://95.85.246.91:8443/api/public/dl/C2btCLUF/distribution.json' // <-- Замени на актуальный порт/путь с хостинга 95.85.246.91
+//const MIRROR_URL = 'http://95.85.246.91:8443/api/public/dl/C2btCLUF/distribution.json' // <-- Замени на актуальный порт/путь с хостинга 95.85.246.91
 const HOME_URL = 'https://lesonos-mc.duckdns.org/launcher/distribution.json' // Основной сервер с сайтом
 
 const api = new DistributionAPI(
