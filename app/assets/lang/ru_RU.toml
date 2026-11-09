@@ -141,7 +141,7 @@ launcherUpdatesHeaderDesc = "Скачивайте, устанавливайте 
 checkForUpdates = "Проверить обновления"
 whatsNew = "Что нового"
 updateReleaseNotes = "Примечания к обновлению"
-sourceGithubLink = "https://lesonos-mc.duckdns.org/"
+sourceGithubLink = "https://github.com/jlecu4ka/LesonOS-Launcher"
 supportLink = "https://t.me/lesonos"
 
 [ejs.waiting]
