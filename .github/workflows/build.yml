@@ -4,7 +4,6 @@ on:
   workflow_dispatch: # Запуск только вручную
 
 jobs:
-  # ЭТАП 1: Сборка под все системы
   release:
     runs-on: ${{ matrix.os }}
     permissions:
@@ -34,7 +33,6 @@ jobs:
         run: npm run dist -- --publish always
         shell: bash
 
-      # Сохраняем файлы, чтобы этап deploy мог их забрать
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -45,7 +43,6 @@ jobs:
             dist/*.dmg
           if-no-files-found: ignore
 
-  # ЭТАП 2: Отправка на сервер (77.239.226.206)
   deploy:
     needs: release
     runs-on: ubuntu-latest
@@ -59,7 +56,7 @@ jobs:
       - name: Deploy to Server via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.SERVER_IP }} # Тут указываешь 77.239.226.206
+          host: ${{ secrets.SERVER_IP }} # Тут в секретах у тебя должно быть 77.239.226.206
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "all-builds/*"
