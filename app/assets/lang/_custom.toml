@@ -4,12 +4,12 @@
 title = "Lesonos Launcher"
 
 [ejs.landing]
-mediaGitHubURL = "#"
+mediaGitHubURL = "https://github.com/jlecu4ka/LesonOS-Launcher"
 mediaXURL = "#"
 mediaInstagramURL = "#"
 mediaYouTubeURL = "#"
-mediaDiscordURL = "https://discord.gg/твой_инвайт" # можешь вставить ссылку
+mediaDiscordURL = "https://discord.gg/GQPMpdmYCA" # можешь вставить ссылку
 
 [ejs.settings]
-sourceGithubLink = "https://lesonos-mc.duckdns.org/"
+sourceGithubLink = "https://github.com/jlecu4ka/LesonOS-Launcher"
 supportLink = "https://t.me/lesonos"
