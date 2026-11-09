@@ -12,7 +12,7 @@ const semver                            = require('semver')
 const { pathToFileURL }                 = require('url')
 const { AZURE_CLIENT_ID, MSFT_OPCODE, MSFT_REPLY_TYPE, MSFT_ERROR, SHELL_OPCODE } = require('./app/assets/js/ipcconstants')
 const LangLoader = require('./app/assets/js/langloader')
-const ConfigManager = require('./app/assets/js/configmanager') // ДОБАВЛЕНА ЭТА СТРОКА
+const ConfigManager = require('./app/assets/js/configmanager')
 
 // Загружаем конфиг ДО того, как настраиваем язык
 ConfigManager.load()
@@ -21,12 +21,8 @@ LangLoader.setupLanguage()
 
 // Setup auto updater.
 function initAutoUpdater(event, data) {
-
     if(data){
         autoUpdater.allowPrerelease = true
-    } else {
-        // Defaults to true if application version contains prerelease components (e.g. 0.12.1-alpha.1)
-        // autoUpdater.allowPrerelease = true
     }
     
     if(isDev){
@@ -36,6 +32,7 @@ function initAutoUpdater(event, data) {
     if(process.platform === 'darwin'){
         autoUpdater.autoDownload = false
     }
+    
     autoUpdater.on('update-available', (info) => {
         event.sender.send('autoUpdateNotification', 'update-available', info)
     })
@@ -62,6 +59,7 @@ ipcMain.on('autoUpdateAction', (event, arg, data) => {
             event.sender.send('autoUpdateNotification', 'ready')
             break
         case 'checkForUpdate':
+            // Проверка обновлений через GitHub API
             autoUpdater.checkForUpdates()
                 .catch(err => {
                     event.sender.send('autoUpdateNotification', 'realerror', err)
@@ -87,6 +85,7 @@ ipcMain.on('autoUpdateAction', (event, arg, data) => {
             break
     }
 })
+
 // Redirect distribution index event from preloader to renderer.
 ipcMain.on('distributionIndexDone', (event, res) => {
     event.sender.send('distributionIndexDone', res)
@@ -96,23 +95,15 @@ ipcMain.on('distributionIndexDone', (event, res) => {
 ipcMain.handle(SHELL_OPCODE.TRASH_ITEM, async (event, ...args) => {
     try {
         await shell.trashItem(args[0])
-        return {
-            result: true
-        }
+        return { result: true }
     } catch(error) {
-        return {
-            result: false,
-            error: error
-        }
+        return { result: false, error: error }
     }
 })
 
-// Disable hardware acceleration.
-// https://electronjs.org/docs/tutorial/offscreen-rendering
 app.disableHardwareAcceleration()
 
 ipcMain.on('relaunch-app', () => {
-    // Даем время файлу конфигурации сохраниться на диск
     setTimeout(() => {
         app.relaunch();
         app.exit(0);
@@ -143,9 +134,7 @@ ipcMain.on(MSFT_OPCODE.OPEN_LOGIN, (ipcEvent, ...arguments_) => {
         icon: getPlatformIcon('SealCircle')
     })
 
-    msftAuthWindow.on('closed', () => {
-        msftAuthWindow = undefined
-    })
+    msftAuthWindow.on('closed', () => { msftAuthWindow = undefined })
 
     msftAuthWindow.on('close', () => {
         if(!msftAuthSuccess) {
@@ -156,13 +145,8 @@ ipcMain.on(MSFT_OPCODE.OPEN_LOGIN, (ipcEvent, ...arguments_) => {
     msftAuthWindow.webContents.on('did-navigate', (_, uri) => {
         if (uri.startsWith(REDIRECT_URI_PREFIX)) {
             let queryMap = {}
-            
-            new URL(uri).searchParams.forEach((v, k) => {
-                queryMap[k] = v;
-            });
-
+            new URL(uri).searchParams.forEach((v, k) => { queryMap[k] = v; });
             ipcEvent.reply(MSFT_OPCODE.REPLY_LOGIN, MSFT_REPLY_TYPE.SUCCESS, queryMap, msftAuthViewSuccess)
-
             msftAuthSuccess = true
             msftAuthWindow.close()
             msftAuthWindow = null
@@ -194,9 +178,7 @@ ipcMain.on(MSFT_OPCODE.OPEN_LOGOUT, (ipcEvent, uuid, isLastAccount) => {
         icon: getPlatformIcon('SealCircle')
     })
 
-    msftLogoutWindow.on('closed', () => {
-        msftLogoutWindow = undefined
-    })
+    msftLogoutWindow.on('closed', () => { msftLogoutWindow = undefined })
 
     msftLogoutWindow.on('close', () => {
         if(!msftLogoutSuccess) {
@@ -215,7 +197,6 @@ ipcMain.on(MSFT_OPCODE.OPEN_LOGOUT, (ipcEvent, uuid, isLastAccount) => {
                     msftLogoutSuccessSent = true
                     ipcEvent.reply(MSFT_OPCODE.REPLY_LOGOUT, MSFT_REPLY_TYPE.SUCCESS, uuid, isLastAccount)
                 }
-
                 if(msftLogoutWindow) {
                     msftLogoutWindow.close()
                     msftLogoutWindow = null
@@ -228,12 +209,9 @@ ipcMain.on(MSFT_OPCODE.OPEN_LOGOUT, (ipcEvent, uuid, isLastAccount) => {
     msftLogoutWindow.loadURL('https://login.microsoftonline.com/common/oauth2/v2.0/logout')
 })
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
 let win
 
 function createWindow() {
-
     win = new BrowserWindow({
         width: 980,
         height: 552,
@@ -255,98 +233,37 @@ function createWindow() {
     Object.entries(data).forEach(([key, val]) => ejse.data(key, val))
 
     win.loadURL(pathToFileURL(path.join(__dirname, 'app', 'app.ejs')).toString())
-    // win.webContents.openDevTools()
-
-    /*win.once('ready-to-show', () => {
-        win.show()
-    })*/
-
     win.removeMenu()
-
     win.resizable = true
 
-    win.on('closed', () => {
-        win = null
-    })
+    win.on('closed', () => { win = null })
 }
 
 function createMenu() {
-    
     if(process.platform === 'darwin') {
-
-        // Extend default included application menu to continue support for quit keyboard shortcut
         let applicationSubMenu = {
             label: 'Application',
-            submenu: [{
-                label: 'About Application',
-                selector: 'orderFrontStandardAboutPanel:'
-            }, {
-                type: 'separator'
-            }, {
-                label: 'Quit',
-                accelerator: 'Command+Q',
-                click: () => {
-                    app.quit()
-                }
-            }]
+            submenu: [{ label: 'About Application', selector: 'orderFrontStandardAboutPanel:' }, { type: 'separator' }, { label: 'Quit', accelerator: 'Command+Q', click: () => { app.quit() } }]
         }
-
-        // New edit menu adds support for text-editing keyboard shortcuts
         let editSubMenu = {
             label: 'Edit',
-            submenu: [{
-                label: 'Undo',
-                accelerator: 'CmdOrCtrl+Z',
-                selector: 'undo:'
-            }, {
-                label: 'Redo',
-                accelerator: 'Shift+CmdOrCtrl+Z',
-                selector: 'redo:'
-            }, {
-                type: 'separator'
-            }, {
-                label: 'Cut',
-                accelerator: 'CmdOrCtrl+X',
-                selector: 'cut:'
-            }, {
-                label: 'Copy',
-                accelerator: 'CmdOrCtrl+C',
-                selector: 'copy:'
-            }, {
-                label: 'Paste',
-                accelerator: 'CmdOrCtrl+V',
-                selector: 'paste:'
-            }, {
-                label: 'Select All',
-                accelerator: 'CmdOrCtrl+A',
-                selector: 'selectAll:'
-            }]
+            submenu: [
+                { label: 'Undo', accelerator: 'CmdOrCtrl+Z', selector: 'undo:' },
+                { label: 'Redo', accelerator: 'Shift+CmdOrCtrl+Z', selector: 'redo:' },
+                { type: 'separator' },
+                { label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
+                { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
+                { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' },
+                { label: 'Select All', accelerator: 'CmdOrCtrl+A', selector: 'selectAll:' }
+            ]
         }
-
-        // Bundle submenus into a single template and build a menu object with it
         let menuTemplate = [applicationSubMenu, editSubMenu]
-        let menuObject = Menu.buildFromTemplate(menuTemplate)
-
-        // Assign it to the application
-        Menu.setApplicationMenu(menuObject)
-
+        Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate))
     }
-
 }
 
 function getPlatformIcon(filename){
-    let ext
-    switch(process.platform) {
-        case 'win32':
-            ext = 'ico'
-            break
-        case 'darwin':
-        case 'linux':
-        default:
-            ext = 'png'
-            break
-    }
-
+    let ext = process.platform === 'win32' ? 'ico' : 'png'
     return path.join(__dirname, 'app', 'assets', 'images', `${filename}.${ext}`)
 }
 
@@ -354,17 +271,9 @@ app.on('ready', createWindow)
 app.on('ready', createMenu)
 
 app.on('window-all-closed', () => {
-    // On macOS it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') {
-        app.quit()
-    }
+    if (process.platform !== 'darwin') { app.quit() }
 })
 
 app.on('activate', () => {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (win === null) {
-        createWindow()
-    }
+    if (win === null) { createWindow() }
 })
